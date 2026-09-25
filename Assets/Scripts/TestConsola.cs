@@ -5,13 +5,13 @@ using UnityEngine.EventSystems;
 public class TestConsola : MonoBehaviour
 {
     public string palabra;
-    public AudioSource sonidito;
+    public string num1 = "Mi nombre es: ";
+    public string num2 = "Maricarmen";
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Debug.Log("Hola lu" + palabra);
-        StartCoroutine (Peo());
+        StartCoroutine (Suma());   
     }
 
     // Update is called once per frame
@@ -20,10 +20,19 @@ public class TestConsola : MonoBehaviour
         
     }
 
-    IEnumerator Peo()
+    IEnumerator Suma()
     {
         yield return new WaitForSeconds(2);
-        sonidito.Play();
+    }
+
+    public void Resultado()
+    {
+        Debug.Log(ProtoSuma(num2));
+    }
+
+    public string ProtoSuma(string bla)
+    {
+        return bla;
     }
 
 }
