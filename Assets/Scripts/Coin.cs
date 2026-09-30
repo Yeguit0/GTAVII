@@ -1,9 +1,10 @@
 using UnityEngine;
 
-public class Pocion : MonoBehaviour
+public class Coin : MonoBehaviour
 {
-    public float cura = 100;
     private PlayerController playerController;
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
@@ -17,10 +18,10 @@ public class Pocion : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.CompareTag("Player"))
+        if (collision.CompareTag("Player"))
         {
-            playerController.vida = cura;
-            Debug.Log(playerController.vida);
+            playerController.coins++;
+            Debug.Log(playerController.coins);
             Destroy(gameObject);
         }
     }

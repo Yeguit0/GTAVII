@@ -18,7 +18,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
 
     public Slider sliderVida;
-    
+    public TextMeshProUGUI coinsText;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -27,7 +28,8 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         sliderVida.value = vida;
-        
+        coinsText.text = coins.ToString();
+
         vidaMax = Mathf.Max(0, 100);
 
         if(vida <= 0)
