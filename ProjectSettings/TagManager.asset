@@ -8,6 +8,7 @@ TagManager:
   - Cura
   - Suelo
   - Enemy
+  - Sword
   layers:
   - Default
   - TransparentFX
