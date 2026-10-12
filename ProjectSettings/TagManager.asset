@@ -9,6 +9,8 @@ TagManager:
   - Suelo
   - Enemy
   - Sword
+  - Spawn
+  - Coin
   layers:
   - Default
   - TransparentFX
@@ -16,11 +18,11 @@ TagManager:
   - Suelo
   - Water
   - UI
+  - Enemy
+  - Trampa
   - 
   - 
-  - 
-  - 
-  - 
+  - Slash
   - 
   - 
   - 

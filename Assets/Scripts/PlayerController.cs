@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+
 using System.Collections;
 using TMPro;
 
@@ -14,18 +15,24 @@ public class PlayerController : MonoBehaviour
     public int coins = 0;
     public float pinchoDam = 20f;
     public float enemyDam = 10f;
+    public float poisonDam;
     public float speed = 5f;
+    public float speedMax = 5f;
     public float jumpForce = 10f;
     public bool isGrounded = false;
     public bool canMove = true;
     public bool canJump = true;
     public bool isDead = false;
+    public bool canAttack = true;
+
+    public GameObject slash;
 
     public SpriteRenderer sr;
     public Transform transform;
     public LayerMask targetLayer;
 
     public Animator animator;
+    public Animator slashAnim;
 
     private Vector2 moveInput;
 
@@ -33,17 +40,28 @@ public class PlayerController : MonoBehaviour
     public TextMeshProUGUI coinsText;
     public TextMeshProUGUI shieldText;
 
+
+
+    //trabajito
+    public Color originalColor;
+    public Color hieloColor;
+    public Color venenoColor;
+    public Color fuegoColor;
+    public string typeDamage;
+
     void Start()
     {
         canMove = true;
         canJump = true;
         isDead = false;
+        canAttack = true;
         sr = GetComponent<SpriteRenderer>();
         transform = GetComponent<Transform>();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         vida = 100;
         shield = 20;
+        poisonDam = (vidaMax / 2);
 
     }
     void Update()
@@ -54,16 +72,24 @@ public class PlayerController : MonoBehaviour
 
         animator.SetFloat("Speed", moveInput.magnitude);
 
-        vidaMax = Mathf.Max(0, 100);
+        vidaMax = 100;
+        shieldMax = 20;
 
-        shieldMax = Mathf.Max(0, 20);
+        if(shield > shieldMax)
+        {
+            shield = shieldMax;
+        }
 
-
+        if(vida > vidaMax)
+        {
+            vida = vidaMax;
+        }
 
         if(isDead)
         {
-            canMove = false;
             canJump = false;
+            canMove = false;
+            speed = 0;
             animator.SetBool("isDead", true);
         }
 
@@ -80,12 +106,17 @@ public class PlayerController : MonoBehaviour
 
         if (rb.linearVelocity.x > 0.1f)
         {
-            sr.flipX = false;
+            Vector3 flip = transform.localScale;
+            flip.x = 1;
+            transform.localScale = flip;
+
         }
         
         else if (rb.linearVelocity.x < -0.1f)
         {
-            sr.flipX = true;
+            Vector3 flip = transform.localScale;
+            flip.x = -1;
+            transform.localScale = flip;
         }
     }
 
@@ -103,6 +134,14 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             animator.SetBool("isJumping", true);
+        }
+    }
+
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        if(context.performed && canAttack)
+        {
+            Instantiate(slash);
         }
     }
 
@@ -135,36 +174,45 @@ public class PlayerController : MonoBehaviour
     {
         if(collision.CompareTag("Pincho") && shield == 0)
         {
-            StartCoroutine(Hurt());
-            vida = vida - pinchoDam;
+            TypeOfDamage("Fuego");
+            //StartCoroutine(Hurt(pinchoDam));
             Debug.Log(vida);
         }
 
         if (collision.CompareTag("Pincho") && shield > 0)
         {
-            StartCoroutine(Hurt());
-            shield = shield - pinchoDam;
+            TypeOfDamage("Fuego");
+            //StartCoroutine(Hurt(pinchoDam));
             Debug.Log(vida);
         }
 
         if (collision.CompareTag("Enemy") && shield == 0)
         {
-            StartCoroutine(Hurt());
-            vida = vida - enemyDam;
+            StartCoroutine(Hurt(enemyDam));
             Debug.Log(vida);
         }
 
         if (collision.CompareTag("Enemy") && shield > 0)
         {
-            StartCoroutine(Hurt());
-            shield = shield - pinchoDam;
+            StartCoroutine(Hurt(enemyDam));
             Debug.Log(vida);
         }
     }
 
-    IEnumerator Hurt()
+    IEnumerator Hurt(float damage)
     {
         animator.SetBool("isHurt", true);
+        
+        if(shield <= 0)
+        {
+            vida = vida - damage;
+        }
+
+        if(shield > 0)
+        {
+            shield = shield - damage;
+        }
+
         yield return new WaitForSeconds(0.2f);
         animator.SetBool("isHurt", false);
     }
@@ -173,5 +221,56 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(0.2f);
         canJump = false;
+    }
+
+    IEnumerator Hielo()
+    {
+        StartCoroutine(Hurt(enemyDam));
+        canMove = false;
+        canJump = false;
+        speed = 0f;
+        sr.color = hieloColor;
+        yield return new WaitForSeconds(2);
+        sr.color = originalColor;
+        canMove = true;
+        canJump = true;
+        speed = 5f;
+    }
+
+    IEnumerator Fuego()
+    {
+        StartCoroutine(Hurt(pinchoDam));
+        sr.color = fuegoColor;
+        speed = speed * 2f;
+        yield return new WaitForSeconds(3f);
+        sr.color = originalColor;
+        speed = speed / 2f;
+        StartCoroutine(Hurt(pinchoDam));
+    }
+
+    IEnumerator Veneno()
+    {
+        StartCoroutine(Hurt(poisonDam));
+        sr.color = venenoColor;
+        yield return new WaitForSeconds(1f);
+        sr.color = originalColor;
+    }
+
+    public void TypeOfDamage(string typeDamage)
+    {
+        if(typeDamage == "Hielo")
+        {
+            StartCoroutine(Hielo());
+        }
+
+        if(typeDamage == "Veneno")
+        {
+            StartCoroutine(Veneno());
+        }
+
+        if(typeDamage == "Fuego")
+        {
+            StartCoroutine(Fuego());
+        }
     }
 }
