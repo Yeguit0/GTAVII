@@ -61,13 +61,14 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         vida = 100;
         shield = 20;
+        sliderVida.value = vida;
+        shieldText.text = shield.ToString();
         poisonDam = (vidaMax / 2);
 
     }
     void Update()
     {
-        sliderVida.value = vida;
-        shieldText.text = shield.ToString();
+        
         coinsText.text = coins.ToString();
 
         animator.SetFloat("Speed", moveInput.magnitude);
@@ -85,7 +86,12 @@ public class PlayerController : MonoBehaviour
             vida = vidaMax;
         }
 
-        if(isDead)
+        if(shield < 0)
+        {
+            shield = 0;
+        }
+
+        if (isDead)
         {
             canJump = false;
             canMove = false;
@@ -95,6 +101,7 @@ public class PlayerController : MonoBehaviour
 
         if(vida <= 0)
         {
+            vida = 0;
             isDead = true;
         }
     }
@@ -172,16 +179,30 @@ public class PlayerController : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.CompareTag("Pincho") && shield == 0)
+        if(collision.CompareTag("Fuego") && shield == 0)
         {
             TypeOfDamage("Fuego");
             //StartCoroutine(Hurt(pinchoDam));
             Debug.Log(vida);
         }
 
-        if (collision.CompareTag("Pincho") && shield > 0)
+        if (collision.CompareTag("Fuego") && shield > 0)
         {
             TypeOfDamage("Fuego");
+            //StartCoroutine(Hurt(pinchoDam));
+            Debug.Log(vida);
+        }
+
+        if (collision.CompareTag("Hielo") && shield == 0)
+        {
+            TypeOfDamage("Hielo");
+            //StartCoroutine(Hurt(pinchoDam));
+            Debug.Log(vida);
+        }
+
+        if (collision.CompareTag("Hielo") && shield > 0)
+        {
+            TypeOfDamage("Hielo");
             //StartCoroutine(Hurt(pinchoDam));
             Debug.Log(vida);
         }
@@ -199,12 +220,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    IEnumerator Hurt(float damage)
+    public IEnumerator Hurt(float damage)
     {
         animator.SetBool("isHurt", true);
         
         if(shield <= 0)
         {
+            shield = 0;
             vida = vida - damage;
         }
 
@@ -212,6 +234,9 @@ public class PlayerController : MonoBehaviour
         {
             shield = shield - damage;
         }
+
+        sliderVida.value = vida;
+        shieldText.text = shield.ToString();
 
         yield return new WaitForSeconds(0.2f);
         animator.SetBool("isHurt", false);

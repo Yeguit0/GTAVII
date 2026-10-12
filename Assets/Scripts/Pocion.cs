@@ -20,6 +20,7 @@ public class Pocion : MonoBehaviour
         if(collision.CompareTag("Player"))
         {
             playerController.vida = cura;
+            playerController.sliderVida.value = playerController.vida;
             Debug.Log(playerController.vida);
             Destroy(gameObject);
         }

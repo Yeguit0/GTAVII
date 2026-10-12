@@ -11,6 +11,9 @@ TagManager:
   - Sword
   - Spawn
   - Coin
+  - Hielo
+  - Fuego
+  - Veneno
   layers:
   - Default
   - TransparentFX

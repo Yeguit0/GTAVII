@@ -16,6 +16,8 @@ public class GreenSlime : MonoBehaviour
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
+
+    public int damage = 2;
     public int vida = 10;
     public bool canMove = true;
     
@@ -57,18 +59,27 @@ public class GreenSlime : MonoBehaviour
         
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            playerController = collision.gameObject.GetComponent<PlayerController>();
+
+            playerController.StartCoroutine(playerController.Hurt(damage));
+            Debug.Log("Vida del jugador: " + playerController.vida);
+        }
+    }
+
     void FollowPlayer()
     {
         Vector2 direction = (player.position - transform.position).normalized;
         transform.position += (Vector3)(direction * moveSpeed * Time.deltaTime);
 
-        if (direction.magnitude > 0.1f)
+        if (direction.x > 0.1f)
         {
             sr.flipX = false;
-
         }
-
-        else if (direction.magnitude < -0.1f)
+        else if (direction.x < -0.1f)
         {
             sr.flipX = true;
         }
